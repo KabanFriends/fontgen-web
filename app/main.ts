@@ -1155,7 +1155,7 @@ async function loadPageForPreview(page: number): Promise<PageLoadResult> {
             log: logger(),
             onlyPage: sourcePage,
             keepRawPages: true,
-            onProgress: (done, total) => setOverlayProgress(done, total, `${done} / ${total} glyphs`),
+            onProgress: (done, total) => setOverlayProgress(done, total, `${done} / ${total} 文字`),
             isCancelled: () => previewCancelled || token !== previewToken,
         });
 
@@ -1304,7 +1304,7 @@ async function generate(): Promise<void> {
     updateGenerateButton();
     resultSection.hidden = true;
     logPre.textContent = '';
-    acquireOverlay('Generating pack');
+    acquireOverlay('リソースパックを生成中');
 
     try {
         invalidateFileMap();
@@ -1314,7 +1314,7 @@ async function generate(): Promise<void> {
             files: mapSource(fileMap),
             msdfgen: await ensurePool(currentThreadCount()),
             log: logger(),
-            onProgress: (done, total) => setOverlayProgress(done, total, `${done} / ${total} glyphs`),
+            onProgress: (done, total) => setOverlayProgress(done, total, `${done} / ${total} 文字`),
             isCancelled: () => exportCancelled,
         });
 
