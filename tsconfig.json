@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "rootDir": ".",
+        "outDir": "dist",
+        "strict": true,
+        "noImplicitOverride": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "types": ["node"],
+        "declaration": false,
+        "sourceMap": false,
+        // DOM: only so app/pool.ts (driven against a fake Worker by
+        // harness/pool-smoke.mjs) type-checks in this browser-free build.
+        "lib": ["ES2022", "DOM"]
+    },
+    "include": ["src/**/*.ts", "harness/**/*.ts", "app/pool.ts"]
+}

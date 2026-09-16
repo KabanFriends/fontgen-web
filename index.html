@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minecraft統合版 日本語フォントエディタ</title>
+</head>
+<body>
+    <div id="layout">
+        <div id="left-col">
+            <section id="fonts-section">
+                <h2>フォントソース</h2>
+                <ol id="font-list" class="empty"></ol>
+                <div class="btn-row">
+                    <button id="add-fonts" type="button">TTF/OTF</button>
+                    <button id="add-bedrock-texture" type="button">統合版テクスチャ</button>
+                    <button id="add-java-texture" type="button">Javaテクスチャ</button>
+                </div>
+                <input id="font-input" type="file" accept=".ttf,.otf" multiple hidden />
+                <input id="bedrock-input" type="file" accept=".png,image/png" multiple hidden />
+            </section>
+
+            <section id="settings-section">
+                <h2>設定</h2>
+                <div class="row">
+                    <label for="range-from">書き出し範囲</label>
+                    <span class="range-pair">
+                        <input id="range-from" value="00" size="4" spellcheck="false" /> –
+                        <input id="range-to" value="FF" size="4" spellcheck="false" />
+                        <span class="hint">(ページ番号, 00-FF)</span>
+                    </span>
+                </div>
+                <div class="row">
+                    <label for="threads">書き出しスレッド数</label>
+                    <input id="threads" type="number" min="1" max="32" step="1" />
+                </div>
+                <details class="advanced">
+                    <summary>高度な設定</summary>
+                    <div class="advanced-body">
+                        <div class="row">
+                            <label for="remap-hangul">ハングル文字を無効化</label>
+                            <input id="remap-hangul" type="checkbox" checked />
+                            <span class="hint">特殊記号にテクスチャ枠を割り当てるために、ハングル文字をU+FFFEにマッピングします</span>
+                        </div>
+                        <div class="row col">
+                            <label for="page-remapping">マッピング設定</label>
+                            <textarea id="page-remapping" rows="10" spellcheck="false">[
+    {"from": "05", "to": "AC"},
+    {"from": "06", "to": "AD"},
+    {"from": "07", "to": "AE"},
+    {"from": "08", "to": "AF"},
+    {"from": "09", "to": "B0"},
+    {"from": "0A", "to": "B1"},
+    {"from": "0B", "to": "B2"},
+    {"from": "0C", "to": "B3"},
+    {"from": "0D", "to": "B4"},
+    {"from": "0E", "to": "B5"},
+    {"from": "0F", "to": "B6"},
+    {"from": "10", "to": "B7"},
+    {"from": "11", "to": "B8"},
+    {"from": "12", "to": "B9"},
+    {"from": "13", "to": "BA"},
+    {"from": "14", "to": "BB"},
+    {"from": "15", "to": "BC"},
+    {"from": "16", "to": "BD"},
+    {"from": "17", "to": "BE"},
+    {"from": "18", "to": "BF"},
+    {"from": "19", "to": "C0"},
+    {"from": "1A", "to": "C1"},
+    {"from": "1B", "to": "C2"},
+    {"from": "1C", "to": "C3"},
+    {"from": "1D", "to": "C4"},
+    {"from": "1E", "to": "C5"},
+    {"from": "1F", "to": "C6"},
+    {"from": "22", "to": "C7"},
+    {"from": "23", "to": "C8"},
+    {"from": "24", "to": "C9"},
+    {"from": "25", "to": "CA"},
+    {"from": "26", "to": "CB"},
+    {"from": "27", "to": "CC"},
+    {"from": "28", "to": "CD"},
+    {"from": "29", "to": "CE"},
+    {"from": "2A", "to": "CF"},
+    {"from": "2B", "to": "D0"},
+    {"from": "2C", "to": "D1"},
+    {"from": "2D", "to": "D2"}
+]</textarea>
+                            <div class="btn-row">
+                                <button id="preset-hangul" type="button">初期設定</button>
+                                <button id="clear-remaps" type="button">クリア</button>
+                                <span id="remap-status" class="hint"></span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+                <div class="btn-row">
+                    <button id="import-config" type="button">インポート</button>
+                    <button id="export-config" type="button" disabled>エクスポート</button>
+                    <input id="config-input" type="file" accept=".json,application/json" hidden />
+                </div>
+            </section>
+
+            <section id="glyph-section" hidden>
+                <h2>字体 <button id="glyph-close" class="icon-btn" type="button" title="deselect">✕</button></h2>
+                <div class="row">
+                    <label>文字コード</label>
+                    <span id="glyph-char" class="mono"></span>
+                </div>
+                <div class="row">
+                    <label for="glyph-width">幅 (px)</label>
+                    <input id="glyph-width" type="number" step="any" min="0" />
+                    <span id="glyph-computed" class="hint"></span>
+                </div>
+                <div class="btn-row">
+                    <button id="glyph-reset" type="button">初期値にリセット</button>
+                </div>
+            </section>
+
+            <section id="overrides-section">
+                <h2>文字幅の強制値設定 <span class="hint"><!--(fixed widths for bitmap glyph ranges; applied to fonts with “ovr” checked)--></span></h2>
+                <table id="override-table">
+                    <thead>
+                        <tr><th>開始</th><th>終了</th><th>文字幅</th><th></th></tr>
+                    </thead>
+                    <tbody id="override-body"></tbody>
+                </table>
+                <div class="btn-row">
+                    <button id="add-override" type="button">範囲を追加</button>
+                    <button id="import-overrides" type="button">インポート</button>
+                    <button id="export-overrides" type="button" disabled>エクスポート</button>
+                    <span id="override-status" class="hint"></span>
+                    <input id="overrides-input" type="file" accept=".json,application/json" hidden />
+                </div>
+            </section>
+
+            <section id="run-section">
+                <h2>生成</h2>
+                <div class="btn-row">
+                    <button id="generate" type="button" class="primary">リソースパックを生成</button>
+                    <span class="hint">範囲内のすべてのページをレンダリングし、.mcpackを出力します</span>
+                </div>
+                <pre id="log" hidden></pre>
+            </section>
+
+            <section id="result-section" hidden>
+                <h2>リソースパック</h2>
+                <div class="row">
+                    <label for="pack-name">名前</label>
+                    <input id="pack-name" value="My resource pack" />
+                </div>
+                <div class="row">
+                    <label for="pack-desc">説明</label>
+                    <input id="pack-desc" value="Pack description" />
+                </div>
+                <div class="row">
+                    <label for="pack-version">バージョン</label>
+                    <input id="pack-version" value="1.0.0" size="7" />
+                </div>
+                <a id="download-zip" class="button primary" download="pack.mcpack">ダウンロード</a>
+            </section>
+        </div>
+
+        <div id="right-col">
+            <section id="page-section">
+                <h2>ページのプレビュー</h2>
+                <div class="row page-nav">
+                    <button id="page-prev" type="button" title="previous page">◀</button>
+                    <input id="page-input" class="page-hex" value="00" size="3" maxlength="2" spellcheck="false" autocomplete="off" />
+                    <button id="page-next" type="button" title="next page">▶</button>
+                    <label class="hint show-widths-label"><input id="show-widths" type="checkbox" /> 文字幅を編集する</label>
+                    <span id="page-stale" class="stale-banner" hidden></span>
+                    <span class="nav-spacer"></span>
+                    <button id="zoom-out" type="button" title="zoom out" class="icon-btn">−</button>
+                    <button id="zoom-in" type="button" title="zoom in" class="icon-btn">+</button>
+                </div>
+                <div id="canvas-wrap">
+                    <canvas id="page-canvas" width="2048" height="2048"></canvas>
+                </div>
+                <p class="status-line"><span id="page-status" class="hint"></span></p>
+            </section>
+        </div>
+    </div>
+
+    <div id="overlay" hidden>
+        <div class="overlay-card">
+            <h3 id="overlay-title">処理中…</h3>
+            <progress id="overlay-bar" max="1" value="0"></progress>
+            <p id="overlay-label" class="hint"></p>
+            <div class="btn-row">
+                <button id="overlay-cancel" type="button">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="java-texture-dialog">
+        <h3>Javaテクスチャを追加</h3>
+        <div class="row file-pick">
+            <label>テクスチャシート (.png)</label>
+            <button id="java-pick-png" type="button">選択…</button>
+            <span id="java-png-name" class="picked">未選択</span>
+            <input id="java-png-input" type="file" accept=".png,image/png" hidden />
+        </div>
+        <div class="row file-pick">
+            <label>文字定義 (.json)</label>
+            <button id="java-pick-json" type="button">選択…</button>
+            <span id="java-json-name" class="picked">未選択</span>
+            <input id="java-json-input" type="file" accept=".json,application/json" hidden />
+        </div>
+        <p class="hint">「chars」配列に、テクスチャシートに含まれる文字リストを記述したJSONファイルが必要です。
+        </p>
+        <div class="btn-row">
+            <button id="java-import" type="button" class="primary" disabled>インポート</button>
+            <button id="java-cancel" type="button">キャンセル</button>
+        </div>
+    </dialog>
+
+    <script type="module" src="/app/main.ts"></script>
+</body>
+</html>
