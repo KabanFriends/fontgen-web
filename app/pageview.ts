@@ -205,7 +205,7 @@ export class PageView {
         const token = ++this.runToken;
         this.setBusy(true);
         this.staleSpan.hidden = true;
-        this.status(`rendering page ${hex2(page)}…`);
+        this.status(`ページ ${hex2(page)} をレンダリング中…`);
         try {
             const result = await this.deps.loadPage(page);
             if (token !== this.runToken) return; // superseded by a newer navigation

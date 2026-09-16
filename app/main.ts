@@ -1130,7 +1130,7 @@ async function loadPageForPreview(page: number): Promise<PageLoadResult> {
 
     const token = ++previewToken;
     previewCancelled = false;
-    acquireOverlay(`Rendering page ${hex2(page)}`);
+    acquireOverlay(`ページ ${hex2(page)} をレンダリング中`);
     try {
         const msdfgen = await ensurePool(currentThreadCount());
         const fileMap = await buildFileMap();
